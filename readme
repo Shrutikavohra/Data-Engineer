@@ -1,0 +1,157 @@
+# 🧮 Promo Sales Data Analysis — Data Engineer Assignment
+
+## 🎯 Goal
+This project solves a business problem for **Company XYZ**, which ran a promo sale for signature items **x, y, z**.  
+The company wants to identify purchase behavior across age groups (18–35 years old) to guide future marketing strategies.
+
+The solution:
+- Connects to a **SQLite3** database.
+- Aggregates item quantities purchased per customer aged **18–35**.
+- Excludes items not purchased (quantity = 0 or NULL).
+- Exports the results to CSV files (semicolon `;` separated).
+- Provides **two implementations**:
+  1. Pure **SQL**
+  2. **Pandas** (Python DataFrame manipulation)
+
+---
+
+## 📂 Project Structure
+
+```
+📁 Data Engineer/
+│
+├── promo_analysis.py          # Main script with SQL and Pandas solutions
+├── create_test_db.py          # Script to create a sample SQLite database
+├── promo_sales.db             # SQLite database file (generated)
+├── promo_result_sql.csv       # Output from SQL query
+├── promo_result_pandas.csv    # Output from Pandas query
+└── README.md                  # This documentation file
+```
+
+---
+
+## 🧰 Requirements
+
+- Python 3.8+
+- Packages:
+  ```bash
+  pip install pandas sqlite3
+  ```
+  (sqlite3 is included with Python by default)
+
+---
+
+## ⚙️ Step-by-Step Setup
+
+### **1️⃣ Clone or Download the Project**
+```bash
+git clone <your-repo-link>
+cd "Data Engineer"
+```
+
+### **2️⃣ Create the Test Database (if not provided)**
+Run:
+```bash
+python create_test_db.py
+```
+✅ This creates a local `promo_sales.db` file with the following tables:
+- `customers`
+- `items`
+- `sales`
+
+and fills them with sample data.
+
+### **3️⃣ Run the Analysis**
+Execute the main analysis script:
+```bash
+python promo_analysis.py
+```
+
+This generates two output CSV files:
+- `promo_result_sql.csv` → SQL-based solution
+- `promo_result_pandas.csv` → Pandas-based solution
+
+---
+
+## 🧠 Logic Overview
+
+### **Business Rules**
+- A customer can make multiple purchases.
+- A sale may include multiple items.
+- Unpurchased items are recorded as `NULL` quantity.
+- Only customers aged **18–35** are analyzed.
+
+### **Outputs**
+Each record in the CSV contains:
+```
+Customer;Age;Item;Quantity
+```
+
+Example:
+```
+1;21;x;10
+2;23;x;1
+2;23;y;1
+2;23;z;1
+3;35;z;2
+```
+
+---
+
+## 💾 SQL Query Overview
+The SQL query aggregates sales data:
+```sql
+SELECT 
+    c.customer_id AS Customer,
+    c.age AS Age,
+    i.item_name AS Item,
+    SUM(s.quantity) AS Quantity
+FROM customers c
+JOIN sales s ON c.customer_id = s.customer_id
+JOIN items i ON s.item_id = i.item_id
+WHERE c.age BETWEEN 18 AND 35
+  AND s.quantity IS NOT NULL
+GROUP BY c.customer_id, c.age, i.item_name
+HAVING SUM(s.quantity) > 0
+ORDER BY c.customer_id, i.item_name;
+```
+
+---
+
+## 📊 Pandas Solution Overview
+1. Load `customers`, `sales`, and `items` tables into DataFrames.  
+2. Merge them using foreign keys.  
+3. Filter by `age` and remove null quantities.  
+4. Group by customer, item, and sum quantities.  
+5. Exclude zero-quantity items.  
+6. Export to CSV.
+
+---
+
+## 🧾 Expected Output
+Two CSV files with the same data, produced by both SQL and Pandas methods.
+
+| Customer | Age | Item | Quantity |
+|-----------|-----|------|-----------|
+| 1 | 21 | x | 10 |
+| 2 | 23 | x | 1 |
+| 2 | 23 | y | 1 |
+| 2 | 23 | z | 1 |
+| 3 | 35 | z | 2 |
+
+---
+
+## 🧹 Notes
+- Update `DB_PATH` in `promo_analysis.py` if your database file is stored elsewhere.
+- If you use your own database, ensure it has the same structure (`customers`, `sales`, `items`).
+
+---
+
+## 👩‍💻 Author
+**Shrutika Vohra**  
+Data Engineering Enthusiast  
+Assignment: *Data Engineer — Promo Sales Analysis*
+
+---
+
+✅ *This project demonstrates SQL and Python data pipeline skills — connecting, transforming, and analyzing marketing sales data efficiently.*
