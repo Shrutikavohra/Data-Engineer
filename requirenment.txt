@@ -1,0 +1,6 @@
+# Core libraries
+pandas==2.2.3
+
+# SQLite is included with Python by default — no need to install it separately
+# (But you can optionally include sqlite-utils for inspection tools)
+sqlite-utils==3.37.0
